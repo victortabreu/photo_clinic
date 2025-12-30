@@ -16,3 +16,6 @@ build/
 # Windows
 Thumbs.db
 desktop.ini
+
+# Imagens da câmera
+*.jpg
