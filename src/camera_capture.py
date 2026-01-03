@@ -1,17 +1,31 @@
 import cv2
 import time
+import os
 
 PREVIEW = 0
 COUNTDOWN = 1
 REVIEW = 2
 
+PHOTO_DIR = "photos"
+JPEG_QUALITY = 95
+
 
 def main():
+    os.makedirs(PHOTO_DIR, exist_ok=True)
+
     cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
         print("Erro: câmera não encontrada")
         return
+
+    # Apenas solicita máxima qualidade disponível
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 9999)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 9999)
+
+    actual_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    actual_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    print(f"Câmera ativa em {actual_w}x{actual_h}")
 
     state = PREVIEW
     captured_frame = None
@@ -24,6 +38,7 @@ def main():
         if not ret:
             break
 
+        # Sempre trabalhar com o frame real
         display_frame = frame.copy()
 
         if state == PREVIEW:
@@ -67,11 +82,12 @@ def main():
                     cv2.LINE_AA,
                 )
             else:
+                # Congela exatamente o frame atual
                 captured_frame = frame.copy()
                 state = REVIEW
 
-
         elif state == REVIEW:
+            # Preview congelado = frame salvo
             display_frame = captured_frame.copy()
             cv2.putText(
                 display_frame,
@@ -97,8 +113,15 @@ def main():
         elif state == REVIEW:
             if key == ord("a"):
                 filename = f"foto_{int(time.time())}.jpg"
-                cv2.imwrite(filename, captured_frame)
-                print(f"Foto salva: {filename}")
+                path = os.path.join(PHOTO_DIR, filename)
+
+                cv2.imwrite(
+                    path,
+                    captured_frame,
+                    [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY]
+                )
+
+                print(f"Foto salva: {path}")
                 state = PREVIEW
 
             elif key == ord("r"):
