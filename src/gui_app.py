@@ -72,12 +72,14 @@ class PhotoClinicApp:
         )
 
         # ===== CAMERA =====
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         if not self.cap.isOpened():
             raise RuntimeError("Erro: câmera não encontrada")
 
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 9999)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 9999)
+        # Preview rápido
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
 
         actual_w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         actual_h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
